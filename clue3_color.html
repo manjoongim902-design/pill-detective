@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>단서 3 · 색깔의 비밀</title>
+<style>
+  :root{--ink:#2a2620;--muted:#7a746a;--line:#ece4d5;--amber:#b5760f;--amber-dk:#7d4f08;--amber-bg:#faeeda;--blue:#185fa5;--card:#fff;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:var(--ink);background:linear-gradient(180deg,#fdf5e6,#f6f0e6);min-height:100vh;line-height:1.65;}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;padding:16px 18px 30px;display:flex;flex-direction:column;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .chip{font-size:12px;font-weight:700;background:var(--amber-bg);color:var(--amber-dk);padding:5px 12px;border-radius:20px;}
+  .dots{display:flex;gap:6px;}.dots i{width:22px;height:6px;border-radius:4px;background:#e6dbc4;}.dots i.on{background:var(--amber);}
+  .screen{display:none;animation:fade .35s ease;flex:1;}.screen.on{display:flex;flex-direction:column;}
+  @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  h1{font-size:25px;margin:2px 0 6px;letter-spacing:-.5px;}
+  .lead{font-size:15px;color:#453f34;margin:0 0 14px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(90,70,30,.05);}
+  .why{font-size:13.5px;color:#4a443a;}.why b{color:var(--amber);}
+  .fact{background:#eef4fb;border:1px solid #cadff3;border-radius:12px;padding:12px 14px;font-size:13px;color:#274a70;margin-top:12px;}
+  .fact b{color:var(--blue);}
+
+  .sun{display:flex;gap:16px;justify-content:center;align-items:flex-end;margin:6px 0 4px;}
+  .box{width:130px;height:96px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:background .4s;}
+  .caps{width:60px;height:34px;border-radius:18px;transition:background .3s;}
+  .cap{text-align:center;font-size:12px;color:var(--muted);margin-top:6px;}
+  .slrow{display:flex;align-items:center;gap:10px;margin-top:14px;}
+  .slrow label{font-size:13px;color:var(--muted);white-space:nowrap;}
+  #sunval{font-weight:800;color:var(--amber);min-width:60px;text-align:right;font-size:14px;}
+  input[type=range]{-webkit-appearance:none;flex:1;height:8px;border-radius:5px;background:#ecdfc4;outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--amber);border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.3);cursor:pointer;}
+  .fb{min-height:20px;font-size:14px;font-weight:600;margin-top:12px;}
+  .fb.g{color:var(--amber-dk);}.fb.b{color:var(--blue);}
+
+  .flip{border:2px solid var(--line);background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:.2s;}
+  .flip .q{font-weight:700;font-size:15px;}
+  .flip .a{display:none;font-size:13.5px;color:#4a443a;margin-top:8px;}
+  .flip.open{border-color:var(--amber);background:var(--amber-bg);}
+  .flip.open .a{display:block;}
+  .flip .tag{font-size:11px;color:var(--muted);}
+
+  .qz{border-top:1px solid var(--line);margin-top:6px;padding-top:14px;display:none;}
+  .qz .q{font-weight:700;font-size:15px;margin-bottom:10px;}
+  .qopt{display:block;width:100%;border:2px solid var(--line);background:#fff;border-radius:12px;padding:13px;margin-bottom:8px;font:inherit;font-size:15px;text-align:left;cursor:pointer;}
+  .qopt.ok{border-color:var(--amber);background:var(--amber-bg);}.qopt.no{border-color:#c0603a;background:#faf1ec;}
+
+  .btn{margin-top:auto;border:none;background:var(--amber);color:#fff;border-radius:14px;padding:16px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;width:100%;}
+  .btn.ghost{background:#fff;color:var(--amber);border:2px solid var(--amber);}
+  .stamp{display:none;text-align:center;padding:18px 10px;}
+  .stamp .seal{width:110px;height:110px;border-radius:50%;border:4px solid var(--amber);color:var(--amber-dk);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:6px auto 12px;transform:rotate(-8deg);}
+  .stamp .seal .big{font-size:30px;}.stamp .seal .sm{font-size:12px;font-weight:700;}
+  .stamp h2{font-size:20px;margin:0 0 4px;color:var(--amber-dk);}.stamp p{font-size:14px;color:var(--muted);margin:0;}
+  footer{text-align:center;color:#b3aa98;font-size:11px;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><span class="chip">단서 3 · 색깔</span><div class="dots"><i class="on" id="d0"></i><i id="d1"></i></div></div>
+
+  <!-- PAGE 1 -->
+  <section class="screen on" id="s0">
+    <h1>색은 옷이자 표지판 🎨</h1>
+    <p class="lead">알약 색은 장식이 아니에요. 슬라이더를 밀어 <b>햇빛 쬐는 시간</b>을 늘려 보세요. 어느 약이 변할까요?</p>
+    <div class="card">
+      <div class="sun">
+        <div><div class="box" id="sunbox" style="background:#faeeda"><div id="pillSun" class="caps" style="background:#d85a30"></div></div><div class="cap">색 옅은 약</div></div>
+        <div><div class="box" style="background:#faeeda"><div class="caps" style="background:#185fa5"></div></div><div class="cap">색깔 옷 입은 약</div></div>
+      </div>
+      <div class="slrow"><label>☀ 햇빛</label><input type="range" id="sun" min="0" max="100" value="0"><span id="sunval">0시간</span></div>
+      <div class="fb" id="f0"></div>
+      <div class="why" style="margin-top:8px;">빛에 약한 성분은 밝은 빛을 오래 받으면 <b>분해</b>돼 힘이 약해져요. 그래서 이산화티타늄 같은 색소로 겉을 칠해 빛을 막아요. 선크림과 같은 원리!</div>
+    </div>
+    <button class="btn" onclick="go(1)">색의 역할 알아보기 →</button>
+    <footer>알약 속 비밀 · 체험용</footer>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="screen" id="s1">
+    <h1>미션 · 색의 3가지 역할</h1>
+    <p class="lead">카드를 <b>눌러 뒤집어</b> 색이 하는 일을 모두 찾아봐요. (3개!)</p>
+    <div class="card">
+      <div class="flip" data-r onclick="flip(this)"><div class="q">① 헷갈리지 않게 <span class="tag">눌러서 확인</span></div><div class="a">비슷하게 생긴 약도 색이 다르면 바로 <b>구별</b>할 수 있어요.</div></div>
+      <div class="flip" data-r onclick="flip(this)"><div class="q">② 햇빛으로부터 <span class="tag">눌러서 확인</span></div><div class="a">진한 색 코팅이 빛을 막아 <b>빛에 약한 성분</b>을 지켜줘요.</div></div>
+      <div class="flip" data-r onclick="flip(this)"><div class="q">③ 잘 챙겨 먹게 <span class="tag">눌러서 확인</span></div><div class="a">"이게 내 약!" 하고 알아봐서 <b>빠뜨리지 않고</b> 먹게 도와요.</div></div>
+      <div class="fact">◎ <b>진짜 이야기</b> — 한 연구에서 먹던 약의 <b>색이 바뀌자</b> 다음 약을 안 챙기는 사람이 약 <b>27% 늘었어요</b>. 색은 '내 약' 신호예요.</div>
+
+      <div class="qz" id="quizC">
+        <div class="q">퀴즈. 진한 색 코팅이 지켜 주는 것은?</div>
+        <button class="qopt" onclick="quiz(this,false)">알약의 무게</button>
+        <button class="qopt" onclick="quiz(this,true)">빛에 약한 성분</button>
+        <button class="qopt" onclick="quiz(this,false)">알약의 소리</button>
+        <div class="fb" id="f2"></div>
+      </div>
+    </div>
+    <div class="stamp" id="stamp">
+      <div class="seal"><span class="big">🎨</span><span class="sm">단서 3 완료</span></div>
+      <h2>색깔 탐정 통과!</h2>
+      <p>세 단서를 모두 모으면 진짜 알약 탐정! 참 잘했어요.</p>
+    </div>
+    <button class="btn ghost" id="back" onclick="go(0)">← 다시 보기</button>
+    <footer>알약 속 비밀 · 체험용</footer>
+  </section>
+</div>
+
+<script>
+  function go(i){
+    document.getElementById('s0').classList.toggle('on',i===0);
+    document.getElementById('s1').classList.toggle('on',i===1);
+    document.getElementById('d0').classList.toggle('on',i===0);
+    document.getElementById('d1').classList.toggle('on',i===1);
+    window.scrollTo(0,0);
+  }
+  var fresh=[216,90,48],faded=[246,224,212],m1=false;
+  var sun=document.getElementById('sun');
+  sun.addEventListener('input',function(){
+    var r=+sun.value/100;
+    var c=fresh.map(function(a,i){return Math.round(a+(faded[i]-a)*r);});
+    document.getElementById('pillSun').style.background='rgb('+c.join(',')+')';
+    document.getElementById('sunval').textContent=Math.round(r*12)+'시간';
+    document.getElementById('sunbox').style.background=+sun.value>60?'#fff6d8':'#faeeda';
+    var f=document.getElementById('f0');
+    if(+sun.value>=80){f.className='fb g';f.textContent='보이죠? 색 옅은 약은 햇빛에 색이 바래며 힘이 약해져요. 색깔 옷 입은 약은 그대로!';m1=true;}
+    else if(+sun.value>0){f.className='fb';f.style.color='var(--muted)';f.textContent='조금씩 옅어지고 있어요... 더 오래!';}
+  });
+
+  var opened=0,m2=false;
+  function flip(el){if(el.dataset.o)return;el.dataset.o=1;el.classList.add('open');opened++;
+    if(opened>=3){document.getElementById('quizC').style.display='block';}}
+  function quiz(b,ok){var f=document.getElementById('f2');
+    if(ok){b.classList.add('ok');f.className='fb g';f.textContent='정답! 색은 빛에 약한 성분을 지켜요.';m2=true;done();}
+    else{b.classList.add('no');f.className='fb b';f.textContent='다시 생각해 볼까요?';}
+  }
+  function done(){if(m2){document.getElementById('stamp').style.display='block';
+    document.getElementById('back').style.display='none';
+    document.getElementById('stamp').scrollIntoView({behavior:'smooth'});}}
+</script>
+</body>
+</html>

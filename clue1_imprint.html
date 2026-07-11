@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>단서 1 · 각인의 비밀</title>
+<style>
+  :root{--ink:#2a251f;--muted:#7a7268;--line:#eee7dc;--clay:#c0603a;--clay-dk:#8a3f22;--clay-bg:#faf1ec;--card:#fff;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:var(--ink);background:linear-gradient(180deg,#fbf3ee,#f4efe7);min-height:100vh;line-height:1.65;}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;padding:16px 18px 30px;display:flex;flex-direction:column;}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .chip{font-size:12px;font-weight:700;background:var(--clay-bg);color:var(--clay-dk);padding:5px 12px;border-radius:20px;}
+  .dots{display:flex;gap:6px;}
+  .dots i{width:22px;height:6px;border-radius:4px;background:#e2d8c8;}
+  .dots i.on{background:var(--clay);}
+  .screen{display:none;animation:fade .35s ease;flex:1;}
+  .screen.on{display:flex;flex-direction:column;}
+  @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  h1{font-size:25px;margin:2px 0 6px;letter-spacing:-.5px;}
+  .lead{font-size:15px;color:#463f37;margin:0 0 14px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(80,60,40,.05);}
+  .why{font-size:13.5px;color:#4a443c;}
+  .why b{color:var(--clay);}
+  .fact{background:#f5faf7;border:1px solid #cde8dd;border-radius:12px;padding:12px 14px;font-size:13px;color:#2f5c4c;margin-top:12px;}
+  .fact b{color:#0f6e56;}
+
+  .zone{position:relative;width:210px;height:110px;margin:6px auto 8px;touch-action:none;}
+  .pill{width:210px;height:110px;border-radius:60px;background:#fff;border:3px solid #d8d0c2;
+    display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;letter-spacing:2px;}
+  .lens{position:absolute;width:96px;height:96px;border-radius:50%;border:4px solid var(--clay);background:#fff;
+    display:none;align-items:center;justify-content:center;font-size:58px;font-weight:800;color:var(--clay-dk);
+    box-shadow:0 6px 18px rgba(0,0,0,.2);pointer-events:none;transform:translate(-50%,-50%);}
+  .tapcap{text-align:center;font-size:12.5px;color:var(--muted);margin-bottom:4px;}
+
+  .opts{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+  .opt{border:2px solid var(--line);background:#fff;border-radius:14px;padding:15px;font:inherit;font-size:16px;
+    text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;transition:.15s;}
+  .opt .mini{width:52px;height:28px;border-radius:16px;border:2px solid #cfc6b6;display:flex;align-items:center;
+    justify-content:center;font-size:13px;font-weight:800;color:#6a6154;flex:0 0 auto;}
+  .opt b{color:var(--clay-dk);}
+  .opt.ok{border-color:#0f6e56;background:#e7f6ef;}
+  .opt.no{border-color:var(--clay);background:var(--clay-bg);}
+  .fb{min-height:20px;font-size:14px;font-weight:600;margin-top:12px;}
+  .fb.g{color:#0f6e56;}.fb.r{color:var(--clay-dk);}
+
+  .btn{margin-top:auto;border:none;background:var(--clay);color:#fff;border-radius:14px;padding:16px;
+    font:inherit;font-size:17px;font-weight:700;cursor:pointer;width:100%;}
+  .btn:disabled{background:#dcd3c6;color:#fff;}
+  .btn.ghost{background:#fff;color:var(--clay);border:2px solid var(--clay);}
+
+  .stamp{display:none;text-align:center;padding:20px 10px;}
+  .stamp .seal{width:110px;height:110px;border-radius:50%;border:4px solid var(--clay);color:var(--clay-dk);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;margin:6px auto 12px;transform:rotate(-8deg);}
+  .stamp .seal .big{font-size:30px;}.stamp .seal .sm{font-size:12px;font-weight:700;}
+  .stamp h2{font-size:20px;margin:0 0 4px;color:var(--clay-dk);}
+  .stamp p{font-size:14px;color:var(--muted);margin:0;}
+  footer{text-align:center;color:#b1a89b;font-size:11px;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <span class="chip">단서 1 · 각인</span>
+    <div class="dots"><i class="on" id="d0"></i><i id="d1"></i></div>
+  </div>
+
+  <!-- PAGE 1 -->
+  <section class="screen on" id="s0">
+    <h1>알약의 주민등록증 🔍</h1>
+    <p class="lead">알약 겉에 새겨진 글자·숫자를 <b>각인</b>이라고 해요. 무슨 약인지, 얼마나 센지, 누가 만들었는지 알려주는 신분증이죠.</p>
+    <div class="card">
+      <p class="tapcap">겉으론 아무것도 안 보이죠? 알약 위에 <b>손가락을 대고 문지르면</b> 숨은 각인이 나타나요!</p>
+      <div class="zone" id="zone">
+        <div class="pill" id="pill"></div>
+        <div class="lens" id="lens">K9</div>
+      </div>
+      <div class="why">각인을 <b>모양·색</b>과 함께 조합하면 세상에 딱 하나뿐인 이름이 돼요. 그래서 약이 섞여도, 응급실에서도 "무슨 약이지?"를 빠르게 알아냅니다.</div>
+      <div class="fact">◎ <b>진짜 이야기</b> — 미국은 법(21 CFR 206)으로 먹는 알약에 각인을 <b>의무</b>로 정해뒀어요. 우리나라도 '낱알 식별 표시'로 관리해요.</div>
+    </div>
+    <button class="btn" onclick="go(1)">돋보기 미션 풀러 가기 →</button>
+    <footer>알약 속 비밀 · 체험용</footer>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="screen" id="s1">
+    <h1>미션 · 진짜 약 찾기</h1>
+    <p class="lead">병에서 알약이 쏟아졌어요! 각인이 <b>K9</b>인 '기침약'을 찾아 눌러요.</p>
+    <div class="card">
+      <div class="opts" id="q1">
+        <button class="opt" data-ok="1"><span class="mini">K9</span> 기침약 <b>(각인 K9)</b></button>
+        <button class="opt"><span class="mini">V5</span> 비타민 <b>(각인 V5)</b></button>
+        <button class="opt"><span class="mini">D2</span> 소화제 <b>(각인 D2)</b></button>
+      </div>
+      <div class="fb" id="f1"></div>
+    </div>
+    <div class="card" id="quizC" style="display:none;">
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;">퀴즈. 각인이 하는 가장 중요한 일은?</div>
+      <div class="opts" id="q2">
+        <button class="opt" onclick="quiz(this,false)">예쁘게 꾸미기</button>
+        <button class="opt" onclick="quiz(this,true)">무슨 약인지 알아보기</button>
+        <button class="opt" onclick="quiz(this,false)">더 달콤하게 만들기</button>
+      </div>
+      <div class="fb" id="f2"></div>
+    </div>
+
+    <div class="stamp" id="stamp">
+      <div class="seal"><span class="big">🔍</span><span class="sm">단서 1 완료</span></div>
+      <h2>각인 탐정 통과!</h2>
+      <p>각인은 알약의 신분증이에요. 다음 부스의 QR도 찍어보세요!</p>
+    </div>
+    <button class="btn ghost" id="back" onclick="go(0)">← 다시 보기</button>
+    <footer>알약 속 비밀 · 체험용</footer>
+  </section>
+</div>
+
+<script>
+  var m1=false,m2=false;
+  function go(i){
+    document.getElementById('s0').classList.toggle('on',i===0);
+    document.getElementById('s1').classList.toggle('on',i===1);
+    document.getElementById('d0').classList.toggle('on',i===0);
+    document.getElementById('d1').classList.toggle('on',i===1);
+    window.scrollTo(0,0);
+  }
+  (function(){
+    var z=document.getElementById('zone'),l=document.getElementById('lens');
+    function mv(e){var r=z.getBoundingClientRect();var p=e.touches?e.touches[0]:e;
+      var x=Math.max(0,Math.min(r.width,p.clientX-r.left)),y=Math.max(0,Math.min(r.height,p.clientY-r.top));
+      l.style.left=x+'px';l.style.top=y+'px';l.style.display='flex';}
+    function hd(){l.style.display='none';}
+    z.addEventListener('mousemove',mv);z.addEventListener('mouseleave',hd);
+    z.addEventListener('touchstart',function(e){e.preventDefault();mv(e);},{passive:false});
+    z.addEventListener('touchmove',function(e){e.preventDefault();mv(e);},{passive:false});
+    z.addEventListener('touchend',hd);
+  })();
+  document.querySelectorAll('#q1 .opt').forEach(function(b){
+    b.onclick=function(){var f=document.getElementById('f1');
+      if(b.dataset.ok){b.classList.add('ok');f.className='fb g';f.textContent='딩동댕! 각인 K9이 똑같아요.';m1=true;
+        document.getElementById('quizC').style.display='block';}
+      else{b.classList.add('no');f.className='fb r';f.textContent='각인을 다시 봐요. 우리가 찾는 건 K9이에요.';}
+    };
+  });
+  function quiz(b,ok){var f=document.getElementById('f2');
+    if(ok){b.classList.add('ok');f.className='fb g';f.textContent='정답! 각인은 약을 알아보는 이름표예요.';m2=true;done();}
+    else{b.classList.add('no');f.className='fb r';f.textContent='다시 생각해 볼까요?';}
+  }
+  function done(){if(m1&&m2){document.getElementById('stamp').style.display='block';
+    document.getElementById('back').style.display='none';
+    document.getElementById('stamp').scrollIntoView({behavior:'smooth'});}}
+</script>
+</body>
+</html>
