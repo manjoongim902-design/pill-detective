@@ -1,0 +1,14 @@
+{
+  "name": "study-tutor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
