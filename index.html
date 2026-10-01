@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 공부 튜터</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<style>
+  :root{--ink:#1f2330;--muted:#6b7183;--line:#e6e8f0;--bg:#f5f6fb;--card:#fff;--brand:#4b5bdc;--brand-dk:#3442b0;--brand-bg:#eef0ff;--ok:#0f8a5f;--ok-bg:#e6f6ef;--no:#c2410c;--no-bg:#fff1ea;}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#e8eaf2;--muted:#9aa0b4;--line:#2c3142;--bg:#141722;--card:#1c2030;--brand:#7c8cff;--brand-dk:#a9b3ff;--brand-bg:#252b48;--ok:#4fd1a0;--ok-bg:#16352b;--no:#ff9a6b;--no-bg:#3a2219;}}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;}
+  .app{max-width:760px;margin:0 auto;padding:16px 16px 40px;}
+  header{display:flex;align-items:center;gap:10px;margin:4px 0 16px;}
+  header .logo{width:36px;height:36px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:800;}
+  header h1{font-size:20px;margin:0;}
+  header p{margin:0;font-size:12.5px;color:var(--muted);}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;}
+  .card h2{font-size:15px;margin:0 0 10px;}
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px;}
+  .drop.over{border-color:var(--brand);background:var(--brand-bg);}
+  .drop b{color:var(--brand);}
+  textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;font-size:14px;background:var(--card);color:var(--ink);resize:vertical;}
+  .or{text-align:center;font-size:12px;color:var(--muted);margin:10px 0;}
+  .loaded{display:none;align-items:center;gap:10px;background:var(--brand-bg);border-radius:12px;padding:10px 12px;font-size:14px;}
+  .loaded .name{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  button{font:inherit;cursor:pointer;}
+  .btn{border:none;background:var(--brand);color:#fff;border-radius:12px;padding:11px 16px;font-weight:700;font-size:14.5px;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--brand);border:1.5px solid var(--brand);}
+  .btn.sm{padding:6px 10px;font-size:13px;border-radius:9px;}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;}
+  .tab{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:12px;padding:10px 4px;font-weight:700;font-size:13.5px;}
+  .tab.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .panel{display:none;}.panel.on{display:block;}
+  .hint{color:var(--muted);font-size:13.5px;}
+  .err{color:var(--no);font-size:14px;font-weight:600;margin-top:8px;}
+  /* 채팅 */
+  .chat{display:flex;flex-direction:column;gap:10px;min-height:160px;max-height:60vh;overflow-y:auto;padding:2px;}
+  .msg{max-width:88%;padding:10px 13px;border-radius:14px;font-size:14.5px;overflow-wrap:anywhere;}
+  .msg.user{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px;white-space:pre-wrap;}
+  .msg.ai{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px;}
+  .msg.ai p:first-child{margin-top:0;}.msg.ai p:last-child{margin-bottom:0;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:6px 11px;font-size:13px;}
+  .composer{display:flex;gap:8px;margin-top:10px;}
+  .composer textarea{min-height:46px;height:46px;}
+  .md h2{font-size:16px;margin:16px 0 6px;}.md h2:first-child{margin-top:0;}
+  .md pre{background:var(--bg);padding:10px;border-radius:8px;overflow-x:auto;}
+  .md code{font-size:13px;}
+  .dots::after{content:"";animation:dots 1.2s steps(4) infinite;}
+  @keyframes dots{0%{content:"";}25%{content:".";}50%{content:"..";}75%{content:"...";}}
+  /* 퀴즈 */
+  .q{border-top:1px solid var(--line);padding:14px 0;}
+  .q:first-child{border-top:none;padding-top:0;}
+  .q .qt{font-weight:700;margin-bottom:8px;}
+  .opt{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:14px;}
+  .opt.ok{border-color:var(--ok);background:var(--ok-bg);}
+  .opt.no{border-color:var(--no);background:var(--no-bg);}
+  .exp{display:none;font-size:13.5px;color:var(--muted);background:var(--bg);border-radius:10px;padding:10px 12px;margin-top:4px;}
+  .score{font-weight:800;font-size:16px;color:var(--brand);}
+  /* 플래시카드 */
+  .fc-wrap{perspective:1000px;margin:6px auto 12px;max-width:440px;}
+  .fc{position:relative;height:220px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer;}
+  .fc.flip{transform:rotateY(180deg);}
+  .fc .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-size:17px;}
+  .fc .front{background:var(--brand-bg);font-weight:800;font-size:20px;}
+  .fc .back{background:var(--card);transform:rotateY(180deg);}
+  .fc-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px;}
+  footer{text-align:center;color:var(--muted);font-size:11.5px;margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">AI</div>
+    <div><h1>AI 공부 튜터</h1><p>강의자료를 올리면 요약 · 퀴즈 · 플래시카드 · 1:1 튜터</p></div>
+  </header>
+
+  <!-- 자료 올리기 -->
+  <section class="card">
+    <h2>① 학습 자료</h2>
+    <div id="pick">
+      <div class="drop" id="drop">PDF를 끌어다 놓거나 <b>눌러서 선택</b>하세요<br><small>최대 약 3MB</small></div>
+      <input type="file" id="file" accept="application/pdf,.pdf,.txt,.md" hidden>
+      <div class="or">또는 텍스트 붙여넣기</div>
+      <textarea id="paste" placeholder="강의 노트나 교재 내용을 붙여넣으세요"></textarea>
+      <div style="text-align:right;margin-top:8px;"><button class="btn sm" id="useText">이 텍스트로 공부하기</button></div>
+    </div>
+    <div class="loaded" id="loaded">📄 <span class="name" id="mName"></span><button class="btn ghost sm" id="change">바꾸기</button></div>
+    <div class="err" id="loadErr"></div>
+  </section>
+
+  <!-- 기능 탭 -->
+  <nav class="tabs">
+    <button class="tab on" data-tab="chat">💬 튜터</button>
+    <button class="tab" data-tab="summary">📝 요약</button>
+    <button class="tab" data-tab="quiz">✅ 퀴즈</button>
+    <button class="tab" data-tab="flashcards">🃏 카드</button>
+  </nav>
+
+  <section class="card panel on" id="p-chat">
+    <div class="chat" id="chat"><div class="hint">자료를 올리고 무엇이든 물어보세요. 자료 내용을 근거로 설명해 드려요.</div></div>
+    <div class="chips" id="chips">
+      <button class="chip">이 자료의 핵심을 3줄로 알려줘</button>
+      <button class="chip">제일 어려운 개념을 쉽게 설명해줘</button>
+      <button class="chip">시험에 나올 만한 부분은?</button>
+      <button class="chip">예시를 들어서 설명해줘</button>
+    </div>
+    <div class="composer">
+      <textarea id="ask" placeholder="질문을 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+      <button class="btn" id="send">전송</button>
+    </div>
+    <div style="text-align:right;margin-top:6px;"><button class="btn ghost sm" id="resetChat">대화 지우기</button></div>
+  </section>
+
+  <section class="card panel" id="p-summary">
+    <div class="row"><span class="hint">자료 전체를 시험 대비용으로 정리해요.</span><button class="btn sm" data-run="summary">요약 만들기</button></div>
+    <div class="md" id="summaryOut"></div>
+  </section>
+
+  <section class="card panel" id="p-quiz">
+    <div class="row"><span class="hint">객관식 8문제를 만들어요.</span><button class="btn sm" data-run="quiz">퀴즈 만들기</button></div>
+    <div id="quizOut"></div>
+  </section>
+
+  <section class="card panel" id="p-flashcards">
+    <div class="row"><span class="hint">카드를 눌러 뒤집어 보세요.</span><button class="btn sm" data-run="flashcards">카드 만들기</button></div>
+    <div id="fcOut"></div>
+  </section>
+
+  <footer>AI 답변은 틀릴 수 있어요. 중요한 내용은 원본 자료로 꼭 확인하세요.</footer>
+</div>
+
+<script>
+  var API = 'api/study';
+  var MAX_BYTES = 3 * 1024 * 1024; // Vercel 요청 한도(4.5MB) 안에 base64로 들어가도록
+  var material = null;   // {type:'pdf'|'text', name, data}
+  var chatLog = [];      // 튜터 대화 [{role, content}]
+  var busy = false;
+
+  function $(id){ return document.getElementById(id); }
+  function md(s){
+    // CDN을 못 불러온 경우엔 서식 없이 글자만 보여줘요.
+    if (!window.marked || !window.DOMPurify) return '<div style="white-space:pre-wrap">' + esc(s || '') + '</div>';
+    return DOMPurify.sanitize(marked.parse(s || ''));
+  }
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* ---------- 자료 올리기 ---------- */
+  var drop = $('drop'), fileIn = $('file');
+  drop.onclick = function(){ fileIn.click(); };
+  drop.ondragover = function(e){ e.preventDefault(); drop.classList.add('over'); };
+  drop.ondragleave = function(){ drop.classList.remove('over'); };
+  drop.ondrop = function(e){ e.preventDefault(); drop.classList.remove('over'); if(e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); };
+  fileIn.onchange = function(){ if(fileIn.files[0]) readFile(fileIn.files[0]); fileIn.value=''; };
+
+  function readFile(f){
+    $('loadErr').textContent = '';
+    if (f.size > MAX_BYTES) { $('loadErr').textContent = '파일이 너무 커요(최대 약 3MB). 필요한 장만 잘라서 올려 주세요.'; return; }
+    var isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+    var r = new FileReader();
+    r.onload = function(){
+      if (isPdf) setMaterial({ type:'pdf', name:f.name, data:String(r.result).split(',')[1] });
+      else setMaterial({ type:'text', name:f.name, data:String(r.result) });
+    };
+    r.onerror = function(){ $('loadErr').textContent = '파일을 읽지 못했어요.'; };
+    isPdf ? r.readAsDataURL(f) : r.readAsText(f);
+  }
+  $('useText').onclick = function(){
+    var t = $('paste').value.trim();
+    if (t.length < 20) { $('loadErr').textContent = '내용을 조금 더 붙여넣어 주세요.'; return; }
+    setMaterial({ type:'text', name:'붙여넣은 텍스트 (' + t.length.toLocaleString() + '자)', data:t });
+  };
+  $('change').onclick = function(){ material = null; $('pick').style.display=''; $('loaded').style.display='none'; };
+
+  function setMaterial(m){
+    material = m;
+    $('mName').textContent = m.name;
+    $('pick').style.display = 'none';
+    $('loaded').style.display = 'flex';
+    $('loadErr').textContent = '';
+    chatLog = []; $('chat').innerHTML = '<div class="hint">“' + esc(m.name) + '”을(를) 읽었어요. 무엇이든 물어보세요!</div>';
+    $('summaryOut').innerHTML = ''; $('quizOut').innerHTML = ''; $('fcOut').innerHTML = '';
+  }
+
+  /* ---------- 탭 ---------- */
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.onclick = function(){
+      document.querySelectorAll('.tab').forEach(function(x){ x.classList.toggle('on', x===t); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('on', p.id === 'p-' + t.dataset.tab); });
+    };
+  });
+
+  /* ---------- 서버 호출 (스트리밍) ---------- */
+  async function callAI(mode, onText){
+    var res = await fetch(API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ mode:mode, material:material, messages: mode==='chat' ? chatLog : [] })
+    });
+    if (!res.ok) {
+      var msg = '요청을 처리하지 못했어요 (' + res.status + ').';
+      try { msg = (await res.json()).error || msg; } catch(e) {}
+      if (res.status === 413) msg = '파일이 너무 커요. 더 작은 파일로 시도해 주세요.';
+      throw new Error(msg);
+    }
+    var reader = res.body.getReader(), dec = new TextDecoder(), text = '';
+    while (true) {
+      var r = await reader.read(); if (r.done) break;
+      text += dec.decode(r.value, { stream:true });
+      if (onText) onText(text.split('[[ERROR]]')[0]);
+    }
+    var parts = text.split('[[ERROR]]');
+    if (parts.length > 1) throw new Error(parts[1].trim());
+    return text;
+  }
+
+  function needMaterial(){
+    if (material) return false;
+    $('loadErr').textContent = '먼저 학습 자료를 올려 주세요.';
+    window.scrollTo({ top:0, behavior:'smooth' });
+    return true;
+  }
+  function setBusy(b){
+    busy = b;
+    document.querySelectorAll('[data-run], #send').forEach(function(x){ x.disabled = b; });
+  }
+
+  /* ---------- 튜터 채팅 ---------- */
+  function bubble(role, html){
+    var d = document.createElement('div'); d.className = 'msg ' + role; d.innerHTML = html;
+    var c = $('chat'); var h = c.querySelector('.hint'); if (h) h.remove();
+    c.appendChild(d); c.scrollTop = c.scrollHeight; return d;
+  }
+  async function ask(q){
+    q = (q || '').trim();
+    if (!q || busy || needMaterial()) return;
+    $('ask').value = '';
+    bubble('user', esc(q));
+    chatLog.push({ role:'user', content:q });
+    var b = bubble('ai', '<span class="dots">생각 중</span>');
+    setBusy(true);
+    try {
+      var out = await callAI('chat', function(t){ b.innerHTML = md(t); $('chat').scrollTop = $('chat').scrollHeight; });
+      chatLog.push({ role:'assistant', content:out });
+    } catch (e) {
+      chatLog.pop(); // 실패한 질문은 대화 기록에서 빼요
+      b.innerHTML = '<span class="err">' + esc(e.message) + '</span>';
+    }
+    setBusy(false);
+  }
+  $('send').onclick = function(){ ask($('ask').value); };
+  $('ask').onkeydown = function(e){ if (e.key==='Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask($('ask').value); } };
+  document.querySelectorAll('#chips .chip').forEach(function(c){ c.onclick = function(){ ask(c.textContent); }; });
+  $('resetChat').onclick = function(){ if (busy) return; chatLog = []; $('chat').innerHTML = '<div class="hint">대화를 지웠어요. 새로 질문해 보세요.</div>'; };
+
+  /* ---------- 요약 · 퀴즈 · 카드 ---------- */
+  document.querySelectorAll('[data-run]').forEach(function(b){
+    b.onclick = function(){ run(b.dataset.run); };
+  });
+  async function run(mode){
+    if (busy || needMaterial()) return;
+    var out = { summary:$('summaryOut'), quiz:$('quizOut'), flashcards:$('fcOut') }[mode];
+    out.innerHTML = '<p class="hint dots">AI가 자료를 읽는 중</p>';
+    setBusy(true);
+    try {
+      if (mode === 'summary') {
+        await callAI('summary', function(t){ out.innerHTML = md(t); });
+      } else {
+        var data = JSON.parse(await callAI(mode));
+        mode === 'quiz' ? renderQuiz(out, data.questions) : renderCards(out, data.cards);
+      }
+    } catch (e) {
+      out.innerHTML = '<p class="err">' + esc(e.message || '결과를 만들지 못했어요. 다시 시도해 주세요.') + '</p>';
+    }
+    setBusy(false);
+  }
+
+  function renderQuiz(el, qs){
+    var solved = 0, right = 0;
+    el.innerHTML = '<p class="score" id="score">0 / ' + qs.length + '</p>';
+    qs.forEach(function(q, i){
+      var box = document.createElement('div'); box.className = 'q';
+      box.innerHTML = '<div class="qt">' + (i+1) + '. ' + esc(q.question) + '</div>';
+      var exp = document.createElement('div'); exp.className = 'exp'; exp.innerHTML = md(q.explanation);
+      q.choices.forEach(function(c, j){
+        var o = document.createElement('button'); o.className = 'opt'; o.textContent = c;
+        o.onclick = function(){
+          if (box.dataset.done) return; box.dataset.done = 1; solved++;
+          var opts = box.querySelectorAll('.opt');
+          opts[q.answer_index] && opts[q.answer_index].classList.add('ok');
+          if (j === q.answer_index) right++; else o.classList.add('no');
+          exp.style.display = 'block';
+          $('score').textContent = right + ' / ' + qs.length + (solved === qs.length ? (right === qs.length ? ' · 만점! 🎉' : ' · 틀린 문제는 튜터에게 물어보세요') : '');
+        };
+        box.appendChild(o);
+      });
+      box.appendChild(exp); el.appendChild(box);
+    });
+  }
+
+  function renderCards(el, cards){
+    var i = 0;
+    el.innerHTML =
+      '<div class="fc-wrap"><div class="fc" id="fc"><div class="face front" id="fcF"></div><div class="face back" id="fcB"></div></div></div>' +
+      '<div class="fc-nav"><button class="btn ghost sm" id="fcPrev">← 이전</button><span class="hint" id="fcN"></span><button class="btn ghost sm" id="fcNext">다음 →</button></div>';
+    function show(){
+      $('fc').classList.remove('flip');
+      $('fcF').textContent = cards[i].front; $('fcB').textContent = cards[i].back;
+      $('fcN').textContent = (i+1) + ' / ' + cards.length;
+    }
+    $('fc').onclick = function(){ $('fc').classList.toggle('flip'); };
+    $('fcPrev').onclick = function(){ i = (i - 1 + cards.length) % cards.length; show(); };
+    $('fcNext').onclick = function(){ i = (i + 1) % cards.length; show(); };
+    show();
+  }
+</script>
+</body>
+</html>
